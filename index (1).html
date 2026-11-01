@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5a9bd">
+  <title>A little birthday surprise</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #532737;
+      --muted: #815465;
+      --rose: #d84977;
+      --cream: #fff9f3;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 32px 18px;
+      overflow-x: hidden;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(255 246 240 / 75%) 0 5%, transparent 29%),
+        radial-gradient(ellipse at 82% 72%, rgb(244 117 163 / 55%) 0 8%, transparent 34%),
+        radial-gradient(ellipse at 70% 8%, rgb(255 219 223 / 70%) 0 7%, transparent 32%),
+        linear-gradient(135deg, #ee8fb0, #f7b7c9 48%, #ed8eab);
+    }
+
+    body::before,
+    body::after {
+      position: fixed;
+      z-index: -1;
+      color: rgb(255 244 241 / 36%);
+      font-size: clamp(9rem, 29vw, 26rem);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    body::before { content: "❀"; top: -12%; left: -8%; transform: rotate(-18deg); }
+    body::after { content: "✿"; right: -9%; bottom: -18%; transform: rotate(24deg); }
+
+    .card {
+      width: min(100%, 900px);
+      min-height: 590px;
+      padding: clamp(30px, 6vw, 66px);
+      overflow: hidden;
+      border: 1px solid rgb(255 255 255 / 60%);
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgb(255 244 243 / 90%), rgb(255 235 238 / 83%));
+      box-shadow: 0 24px 80px rgb(100 32 59 / 23%);
+      text-align: center;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .card::before,
+    .card::after {
+      position: absolute;
+      z-index: -1;
+      color: rgb(215 81 119 / 9%);
+      font-size: 13rem;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .card::before { content: "✿"; top: -65px; left: -38px; transform: rotate(-20deg); }
+    .card::after { content: "❀"; right: -48px; bottom: -84px; transform: rotate(22deg); }
+
+    .eyebrow {
+      margin: 0 0 15px;
+      color: var(--rose);
+      font: 700 .74rem/1.2 system-ui, sans-serif;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 auto;
+      font-family: "Brush Script MT", "Segoe Script", cursive;
+      font-size: clamp(3.2rem, 9vw, 6.4rem);
+      font-weight: 400;
+      letter-spacing: -.045em;
+      line-height: .98;
+      text-shadow: 0 2px 0 rgb(255 255 255 / 60%);
+    }
+
+    .intro {
+      margin: 20px 0 38px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 0 auto;
+    }
+
+    .choice {
+      min-height: 205px;
+      padding: 18px 12px;
+      border: 1px solid rgb(205 94 124 / 19%);
+      border-radius: 19px;
+      color: var(--ink);
+      background: rgb(255 251 247 / 78%);
+      cursor: pointer;
+      font: inherit;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .choice:hover,
+    .choice:focus-visible {
+      transform: translateY(-5px);
+      background: #fff;
+      box-shadow: 0 13px 28px rgb(112 43 70 / 14%);
+    }
+
+    .choice:focus-visible,
+    .action:focus-visible,
+    .back:focus-visible { outline: 3px solid #8e3152; outline-offset: 4px; }
+
+    .choice-icon {
+      display: block;
+      margin: 0 auto 13px;
+      font-size: 3.8rem;
+      filter: drop-shadow(0 5px 5px rgb(112 43 70 / 12%));
+    }
+
+    .choice-label {
+      display: block;
+      font-size: 1rem;
+      font-style: italic;
+    }
+
+    .panel {
+      animation: appear .5s ease both;
+    }
+
+    .panel h2 {
+      margin: 10px 0 12px;
+      font-family: "Brush Script MT", "Segoe Script", cursive;
+      font-size: clamp(2.3rem, 7vw, 4rem);
+      font-weight: 400;
+      line-height: 1.1;
+    }
+
+    .panel-copy {
+      max-width: 560px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.15rem);
+      line-height: 1.8;
+    }
+
+    .back {
+      margin-top: 30px;
+      padding: 10px 16px;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font: .9rem system-ui, sans-serif;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .action {
+      margin-top: 24px;
+      padding: 13px 23px;
+      border: 0;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--rose);
+      cursor: pointer;
+      font: 600 .95rem system-ui, sans-serif;
+      box-shadow: 0 7px 18px rgb(216 79 120 / 23%);
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .action:hover { transform: translateY(-2px); background: #bd3f67; }
+    .hidden { display: none; }
+
+    .proposal-card {
+      position: relative;
+      max-width: 650px;
+      margin: 20px auto 0;
+      padding: clamp(24px, 6vw, 48px);
+      border: 2px solid #f3a4b9;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 8% 12%, #f8b8c8 0 4px, transparent 5px),
+        radial-gradient(circle at 92% 18%, #ec809e 0 5px, transparent 6px),
+        radial-gradient(circle at 14% 88%, #ec809e 0 5px, transparent 6px),
+        radial-gradient(circle at 87% 83%, #f8b8c8 0 4px, transparent 5px),
+        #fff4f5;
+      box-shadow: inset 0 0 0 7px rgb(255 255 255 / 55%), 0 14px 35px rgb(112 43 70 / 12%);
+    }
+
+    .proposal-card::before,
+    .proposal-card::after {
+      position: absolute;
+      color: #e9829c;
+      font-size: 1.5rem;
+      content: "♥";
+      animation: twinkle 1.8s ease-in-out infinite alternate;
+    }
+
+    .proposal-card::before { top: 16px; left: 18px; }
+    .proposal-card::after { right: 18px; bottom: 14px; animation-delay: -.8s; }
+
+    .proposal-mascot {
+      display: block;
+      width: 112px;
+      height: 112px;
+      margin: 0 auto 8px;
+      animation: float 2.4s ease-in-out infinite;
+    }
+
+    .proposal-card h2 { margin: 8px 0 22px; }
+
+    .proposal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 25px;
+    }
+
+    .answer {
+      min-width: 120px;
+      padding: 11px 26px;
+      border: 2px dotted #c44e70;
+      border-radius: 999px;
+      color: #762d47;
+      background: #ffe4eb;
+      cursor: pointer;
+      font: 700 1rem system-ui, sans-serif;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .answer:hover { transform: translateY(-3px); background: #ffd2df; }
+    .answer-yes { background: #f7c6d3; }
+    .answer-yes:hover { background: #f4afc2; }
+
+    .answer-no.is-running {
+      position: fixed;
+      z-index: 20;
+      margin: 0;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .memories-card {
+      display: grid;
+      grid-template-columns: minmax(180px, .9fr) minmax(180px, 1fr);
+      align-items: center;
+      gap: 24px;
+      max-width: 650px;
+      margin: 22px auto 0;
+      padding: clamp(20px, 5vw, 36px);
+      border: 2px solid #f3a4b9;
+      border-radius: 22px;
+      background: #fff4f5;
+      box-shadow: 0 14px 35px rgb(112 43 70 / 12%);
+    }
+
+    .memory-frames { display: grid; gap: 12px; }
+
+    .memory-frame {
+      min-height: 125px;
+      display: grid;
+      place-items: center;
+      border: 8px solid #fff;
+      background: linear-gradient(145deg, #f8b8c8, #fbe0d8 55%, #ef94ac);
+      box-shadow: 0 5px 14px rgb(112 43 70 / 13%);
+      font-size: 3rem;
+    }
+
+    .memory-note {
+      padding: 22px 18px;
+      border: 1px solid #e8c1c8;
+      border-radius: 12px;
+      color: var(--muted);
+      background: #fffdf9;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      text-align: left;
+    }
+
+    .flower-message {
+      max-width: 700px;
+      margin: 22px auto 0;
+      padding: clamp(22px, 5vw, 40px);
+      border: 2px solid #bf4b5e;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 8% 12%, #ffcfda 0 4px, transparent 5px),
+        radial-gradient(circle at 92% 18%, #ffcfda 0 5px, transparent 6px),
+        radial-gradient(circle at 14% 88%, #ffcfda 0 5px, transparent 6px),
+        radial-gradient(circle at 87% 83%, #ffcfda 0 4px, transparent 5px),
+        linear-gradient(145deg, #f06472, #e64e67 55%, #f47e87);
+      box-shadow: inset 0 0 0 7px rgb(255 255 255 / 13%), 0 14px 35px rgb(112 43 70 / 15%);
+      color: #fffaf5;
+    }
+
+    .flower-message h2,
+    .flower-message .eyebrow { color: #fffaf5; }
+
+    .flower-message .bouquet { width: min(100%, 300px); }
+
+    .flower-notes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .flower-note {
+      padding: 13px 10px;
+      border: 1px solid rgb(255 255 255 / 60%);
+      border-radius: 12px;
+      color: #733648;
+      background: #fff1ed;
+      font-size: .95rem;
+      line-height: 1.5;
+    }
+
+    .bouquet {
+      display: block;
+      width: min(100%, 330px);
+      height: auto;
+      margin: 12px auto 18px;
+      overflow: visible;
+    }
+
+    .bouquet .tulip-head { transform-box: fill-box; transform-origin: bottom center; animation: sway 2.8s ease-in-out infinite; }
+    .bouquet .tulip-head:nth-of-type(2n) { animation-delay: -.8s; }
+    .gift {
+      display: block;
+      margin: 18px auto 20px;
+      font-size: clamp(5rem, 16vw, 8rem);
+      filter: drop-shadow(0 12px 8px rgb(112 43 70 / 18%));
+      animation: float 2.2s ease-in-out infinite;
+    }
+
+    .letter {
+      max-width: 570px;
+      margin: 22px auto 0;
+      padding: clamp(22px, 5vw, 38px);
+      border: 1px solid #f1ced5;
+      border-radius: 8px;
+      background: #fffaf5;
+      box-shadow: 0 12px 28px rgb(112 43 70 / 10%);
+      text-align: left;
+      transform: rotate(-1deg);
+    }
+
+    .letter p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.85;
+    }
+
+    .letter .signoff { color: var(--rose); font-style: italic; }
+    .sparkle { display: inline-block; animation: twinkle 1.4s ease-in-out infinite alternate; }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(9px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes twinkle { to { transform: scale(1.2) rotate(12deg); } }
+    @keyframes sway { 50% { transform: rotate(7deg); } }
+    @keyframes float { 50% { transform: translateY(-8px) rotate(2deg); } }
+
+    @media (max-width: 600px) {
+      body { padding: 18px 12px; }
+      .card { min-height: 0; padding: 34px 22px; border-radius: 23px; }
+      .intro { margin-bottom: 26px; }
+      .choices { grid-template-columns: 1fr; gap: 10px; }
+      .choice { min-height: 76px; display: flex; align-items: center; gap: 15px; padding: 10px 17px; text-align: left; }
+      .choice-icon { width: 48px; margin: 0; font-size: 2.5rem; text-align: center; }
+      .panel { padding: 12px 0; }
+      .letter { transform: none; }
+      .proposal-card { padding: 28px 18px; }
+      .proposal-actions { gap: 10px; }
+      .answer { min-width: 105px; }
+      .memories-card { grid-template-columns: 1fr; }
+      .memory-frames { grid-template-columns: 1fr 1fr; }
+      .memory-frame { min-height: 95px; }
+      .flower-notes { grid-template-columns: 1fr; gap: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <section class="panel" id="home" aria-labelledby="birthday-title">
+      <p class="eyebrow">A little something, just for you</p>
+      <h1 id="birthday-title" tabindex="-1">Happy Birthday,<br>Boss! <span class="sparkle" aria-hidden="true">✦</span></h1>
+      <p class="intro">Choose one to get started!</p>
+
+      <nav class="choices" aria-label="Birthday surprises">
+        <button class="choice" type="button" data-open="flowers">
+          <span class="choice-icon" aria-hidden="true">💐</span>
+          <span class="choice-label">Flowers for you</span>
+        </button>
+        <button class="choice" type="button" data-open="court-proposal">
+          <span class="choice-icon" aria-hidden="true">🎁</span>
+          <span class="choice-label">Open my surprise</span>
+        </button>
+        <button class="choice" type="button" data-open="letter">
+          <span class="choice-icon" aria-hidden="true">💌</span>
+          <span class="choice-label">Letter just for you</span>
+        </button>
+      </nav>
+    </section>
+
+    <section class="panel hidden" id="flowers" aria-labelledby="flowers-title" aria-live="polite">
+      <p class="eyebrow">Picked just for you</p>
+      <h2 id="flowers-title" tabindex="-1">A bouquet to brighten your day</h2>
+      <svg class="bouquet" viewBox="0 0 320 230" role="img" aria-label="A hand-drawn bouquet of pink and yellow tulips">
+        <path d="M92 75 C112 124 105 170 151 206 M151 73 C143 123 143 163 158 205 M208 74 C186 125 181 160 166 205 M126 102 C125 148 140 178 158 207 M181 99 C180 150 171 179 162 207" fill="none" stroke="#648c5c" stroke-width="6" stroke-linecap="round"/>
+        <path d="M116 132 C94 120 86 135 118 155 C130 138 127 129 116 132 M184 139 C210 123 221 138 186 163 C174 148 175 139 184 139 M141 164 C119 153 112 169 145 185" fill="#87a96c" stroke="#648c5c" stroke-width="2"/>
+        <g class="tulip-head">
+          <path d="M73 87 C61 73 66 54 74 42 C80 54 88 58 94 42 C105 60 108 77 94 89 C88 95 79 94 73 87Z" fill="#ed6f94"/>
+          <path d="M130 75 C117 60 123 42 132 29 C137 42 146 45 152 29 C163 47 164 64 151 77 C145 83 136 82 130 75Z" fill="#f3a347"/>
+          <path d="M189 84 C178 70 183 53 191 40 C197 53 205 56 211 40 C223 58 224 74 211 86 C205 92 195 91 189 84Z" fill="#e75e85"/>
+          <path d="M112 123 C102 111 106 96 114 85 C119 97 127 99 133 85 C144 101 145 115 133 125 C127 131 118 130 112 123Z" fill="#f28aa6"/>
+          <path d="M164 120 C153 107 158 92 166 81 C171 93 179 95 185 81 C196 97 197 111 185 122 C179 128 170 127 164 120Z" fill="#f3a347"/>
+        </g>
+        <path d="M111 171 Q157 185 207 163 L193 216 Q159 230 126 212Z" fill="#e993a9"/>
+        <path d="M111 171 Q158 185 207 163 L202 179 Q157 199 116 185Z" fill="#d56d89"/>
+        <path d="M148 188 Q159 181 171 188 L164 202 L176 213 L158 209 L143 216 L151 201Z" fill="#fff0eb"/>
+      </svg>
+      <p class="panel-copy">A little bunch of springtime, just for you. May your year be as lovely, bright, and one-of-a-kind as you are. 🌷</p>
+      <button class="back" type="button" data-home>← Back to your birthday gifts</button>
+    </section>
+
+    <section class="panel hidden" id="court-proposal" aria-labelledby="proposal-title" aria-live="polite">
+      <p class="eyebrow">A question from my heart</p>
+      <div class="proposal-card">
+        <svg class="proposal-mascot" viewBox="0 0 120 120" role="img" aria-label="A little smiling flower">
+          <g fill="#f3a2b5" stroke="#a74967" stroke-width="2">
+            <ellipse cx="60" cy="27" rx="13" ry="20"/>
+            <ellipse cx="60" cy="27" rx="13" ry="20" transform="rotate(60 60 60)"/>
+            <ellipse cx="60" cy="27" rx="13" ry="20" transform="rotate(120 60 60)"/>
+            <ellipse cx="60" cy="27" rx="13" ry="20" transform="rotate(180 60 60)"/>
+            <ellipse cx="60" cy="27" rx="13" ry="20" transform="rotate(240 60 60)"/>
+            <ellipse cx="60" cy="27" rx="13" ry="20" transform="rotate(300 60 60)"/>
+          </g>
+          <circle cx="60" cy="60" r="20" fill="#ffdf91" stroke="#a74967" stroke-width="2"/>
+          <circle cx="53" cy="58" r="2" fill="#532737" stroke="none"/>
+          <circle cx="67" cy="58" r="2" fill="#532737" stroke="none"/>
+          <path d="M54 66 Q60 72 66 66" fill="none" stroke="#8f4359" stroke-width="2" stroke-linecap="round"/>
+          <path d="M58 79 C55 91 56 99 53 108 M62 79 C64 89 64 99 68 108" fill="none" stroke="#648c5c" stroke-width="4" stroke-linecap="round"/>
+          <path d="M56 92 Q44 84 42 94 Q50 100 57 98 M64 99 Q77 89 81 97 Q75 106 66 105" fill="#87a96c" stroke="#648c5c" stroke-width="1.5"/>
+        </svg>
+        <h2 id="proposal-title" tabindex="-1">Fionah, may I court you?</h2>
+        <p class="panel-copy">I like you, and I’d love the chance to get to know you more intentionally. Would you be comfortable with me courting you?</p>
+        <div class="proposal-actions" aria-label="Your answer">
+          <button class="answer answer-yes" id="court-yes" type="button">Yes ♡</button>
+          <button class="answer answer-no" id="court-no" type="button">No</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="court-memories" aria-labelledby="memories-title" aria-live="polite">
+      <p class="eyebrow">A little note for you</p>
+      <h2 id="memories-title" tabindex="-1">Forever Together</h2>
+      <div class="memories-card">
+        <div class="memory-frames" aria-label="Two photo keepsake frames">
+          <div class="memory-frame" aria-hidden="true">💗</div>
+          <div class="memory-frame" aria-hidden="true">🌅</div>
+        </div>
+        <p class="memory-note">I’d love to make special memories with you, and I can’t wait to create more.</p>
+      </div>
+      <button class="action" id="next-court-page" type="button">Next →</button>
+    </section>
+
+    <section class="panel hidden" id="court-flowers" aria-labelledby="court-flowers-title" aria-live="polite">
+      <div class="flower-message">
+        <p class="eyebrow">A little something from me</p>
+        <h2 id="court-flowers-title" tabindex="-1">Flowers for my love</h2>
+        <svg class="bouquet" viewBox="0 0 320 230" role="img" aria-label="A hand-drawn bouquet of pink and yellow tulips">
+          <path d="M92 75 C112 124 105 170 151 206 M151 73 C143 123 143 163 158 205 M208 74 C186 125 181 160 166 205 M126 102 C125 148 140 178 158 207 M181 99 C180 150 171 179 162 207" fill="none" stroke="#648c5c" stroke-width="6" stroke-linecap="round"/>
+          <path d="M116 132 C94 120 86 135 118 155 C130 138 127 129 116 132 M184 139 C210 123 221 138 186 163 C174 148 175 139 184 139 M141 164 C119 153 112 169 145 185" fill="#87a96c" stroke="#648c5c" stroke-width="2"/>
+          <g class="tulip-head">
+            <path d="M73 87 C61 73 66 54 74 42 C80 54 88 58 94 42 C105 60 108 77 94 89 C88 95 79 94 73 87Z" fill="#ed6f94"/>
+            <path d="M130 75 C117 60 123 42 132 29 C137 42 146 45 152 29 C163 47 164 64 151 77 C145 83 136 82 130 75Z" fill="#f3a347"/>
+            <path d="M189 84 C178 70 183 53 191 40 C197 53 205 56 211 40 C223 58 224 74 211 86 C205 92 195 91 189 84Z" fill="#e75e85"/>
+            <path d="M112 123 C102 111 106 96 114 85 C119 97 127 99 133 85 C144 101 145 115 133 125 C127 131 118 130 112 123Z" fill="#f28aa6"/>
+            <path d="M164 120 C153 107 158 92 166 81 C171 93 179 95 185 81 C196 97 197 111 185 122 C179 128 170 127 164 120Z" fill="#f3a347"/>
+          </g>
+          <path d="M111 171 Q157 185 207 163 L193 216 Q159 230 126 212Z" fill="#e993a9"/>
+          <path d="M111 171 Q158 185 207 163 L202 179 Q157 199 116 185Z" fill="#d56d89"/>
+          <path d="M148 188 Q159 181 171 188 L164 202 L176 213 L158 209 L143 216 L151 201Z" fill="#fff0eb"/>
+        </svg>
+        <div class="flower-notes">
+          <div class="flower-note">I think about you every day.</div>
+          <div class="flower-note">My heart rose when I saw you.</div>
+          <div class="flower-note">I will never leaf you.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="letter" aria-labelledby="letter-title" aria-live="polite">
+      <p class="eyebrow">A few words from my heart</p>
+      <h2 id="letter-title" tabindex="-1">Letter just for you</h2>
+      <article class="letter">
+        <p>Dear favorite person,</p>
+        <p>My favorite memories always have you in them. Thank you for being exactly who you are and for making ordinary days feel special. I hope this next year brings you laughter, gentle moments, and all the love you give to everyone around you.</p>
+        <p class="signoff">Happy birthday. I'm so glad I get to celebrate you. ♡</p>
+      </article>
+      <button class="back" type="button" data-home>← Back to your birthday gifts</button>
+    </section>
+  </main>
+
+  <script>
+    const panels = document.querySelectorAll(".panel");
+
+    function showPanel(id) {
+      panels.forEach((panel) => {
+        const isCurrent = panel.id === id;
+        panel.classList.toggle("hidden", !isCurrent);
+        panel.setAttribute("aria-hidden", String(!isCurrent));
+      });
+
+      const currentPanel = document.getElementById(id);
+      if (id === "court-proposal") {
+        noButton.classList.remove("is-running");
+        noButton.style.left = "";
+        noButton.style.top = "";
+      }
+
+      currentPanel.querySelector("h1, h2").focus?.({ preventScroll: true });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.querySelectorAll("[data-open]").forEach((button) => {
+      button.addEventListener("click", () => showPanel(button.dataset.open));
+    });
+
+    document.querySelectorAll("[data-home]").forEach((button) => {
+      button.addEventListener("click", () => showPanel("home"));
+    });
+
+    const noButton = document.querySelector("#court-no");
+
+    // Make the No button dodge mouse, touch, and keyboard attempts.
+    // Random coordinates allow it to appear anywhere within the screen.
+    function moveNoButton(pointerX = -1000, pointerY = -1000) {
+      const bounds = noButton.getBoundingClientRect();
+      const margin = 12;
+      const maxLeft = Math.max(margin, window.innerWidth - bounds.width - margin);
+      const maxTop = Math.max(margin, window.innerHeight - bounds.height - margin);
+      let left = margin;
+      let top = margin;
+
+      for (let attempts = 0; attempts < 30; attempts += 1) {
+        left = margin + Math.random() * Math.max(0, maxLeft - margin);
+        top = margin + Math.random() * Math.max(0, maxTop - margin);
+        const distanceFromPointer = Math.hypot(
+          left + bounds.width / 2 - pointerX,
+          top + bounds.height / 2 - pointerY
+        );
+        const distanceFromPrevious = Math.hypot(left - bounds.left, top - bounds.top);
+        if (distanceFromPointer > 130 && distanceFromPrevious > 90) break;
+      }
+
+      noButton.classList.add("is-running");
+      noButton.style.left = `${left}px`;
+      noButton.style.top = `${top}px`;
+    }
+
+    noButton.addEventListener("pointerenter", (event) => {
+      if (event.pointerType === "mouse" || event.pointerType === "pen") {
+        moveNoButton(event.clientX, event.clientY);
+      }
+    });
+
+    noButton.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      moveNoButton(event.clientX, event.clientY);
+    });
+
+    noButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      moveNoButton();
+    });
+
+    window.addEventListener("resize", () => {
+      if (!noButton.classList.contains("is-running")) return;
+      const bounds = noButton.getBoundingClientRect();
+      noButton.style.left = `${Math.max(8, Math.min(bounds.left, window.innerWidth - bounds.width - 8))}px`;
+      noButton.style.top = `${Math.max(8, Math.min(bounds.top, window.innerHeight - bounds.height - 8))}px`;
+    });
+
+    document.querySelector("#court-yes").addEventListener("click", () => {
+      showPanel("court-memories");
+    });
+
+    document.querySelector("#next-court-page").addEventListener("click", () => {
+      showPanel("court-flowers");
+    });
+  </script>
+</body>
+</html>
